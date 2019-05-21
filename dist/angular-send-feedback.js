@@ -483,35 +483,33 @@ angular.module('angular-send-feedback').directive('angularFeedback', [ function(
                                     if (!settings.screenshotStroke) {
                                         redraw(ctx, false);
                                     }
-                                    html2canvas($('body'), {
-                                        onrendered: function(canvas) {
-                                            if (!settings.screenshotStroke) {
-                                                redraw(ctx);
-                                            }
-                                            _canvas = $('<canvas id="feedback-canvas-tmp" width="'+ w +'" height="'+ dh +'"/>').hide().appendTo('body');
-                                            _ctx = _canvas.get(0).getContext('2d');
-                                            _ctx.drawImage(canvas, 0, sy, w, dh, 0, 0, w, dh);
-                                            img = _canvas.get(0).toDataURL();
-                                            $(document).scrollTop(sy);
-                                            post.img = img;
-                                            settings.onScreenshotTaken(post.img);
-                                            if(settings.showDescriptionModal) {
-                                                $('#feedback-canvas-tmp').remove();
-                                                $('#feedback-overview').show();
-                                                $('#feedback-overview-description-text>textarea').remove();
-                                                $('#feedback-overview-screenshot>img').remove();
-                                                $('<textarea id="feedback-overview-note">' + $('#feedback-note').val() + '</textarea>').insertAfter('#feedback-overview-description-text h3:eq(0)');
-                                                $('#feedback-overview-screenshot').append('<img class="feedback-screenshot" src="' + img + '" />');
-                                            }
-                                            else {
-                                                $('#feedback-module').remove();
-                                                close();
-                                                _canvas.remove();
-                                            }
-                                        },
-                                        proxy: settings.proxy,
-                                        letterRendering: settings.letterRendering
-                                    });
+                                    html2canvas($('body')[0]).then(canvas => {
+                                        if (!settings.screenshotStroke) {
+                                            redraw(ctx);
+                                        }
+
+                                        _canvas = $('<canvas id="feedback-canvas-tmp" width="'+ w +'" height="'+ dh +'"/>').hide().appendTo('body');
+                                        _ctx = _canvas.get(0).getContext('2d');
+                                        _ctx.drawImage(canvas, 0, sy, w, dh, 0, 0, w, dh);
+
+                                        img = _canvas.get(0).toDataURL();
+                                        $(document).scrollTop(sy);
+                                        post.img = img;
+                                        settings.onScreenshotTaken(post.img);
+                                        if(settings.showDescriptionModal) {
+                                            $('#feedback-canvas-tmp').remove();
+                                            $('#feedback-overview').show();
+                                            $('#feedback-overview-description-text>textarea').remove();
+                                            $('#feedback-overview-screenshot>img').remove();
+                                            $('<textarea id="feedback-overview-note">' + $('#feedback-note').val() + '</textarea>').insertAfter('#feedback-overview-description-text h3:eq(0)');
+                                            $('#feedback-overview-screenshot').append('<img class="feedback-screenshot" src="' + img + '" />');
+                                        }
+                                        else {
+                                            $('#feedback-module').remove();
+                                            close();
+                                            _canvas.remove();
+                                        }
+                                    })
                                 });
 
                                 $(document).on('click', '#feedback-overview-back', function(e) {
